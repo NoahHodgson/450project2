@@ -181,16 +181,18 @@ int main(int argc, char* argv[])
 					printf("Enter send conditional\n");
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("datagram transfer complete\n");
-					printf("waiting for ack w/ seq: %d", seq);
+					printf("waiting for ack w/ seq: %d\n", seq);
 					wait = 1;
 					//clearBuf(net_buf);
 					//printf("Waiting for datagram ack w/ seq: %d", seq);
 					packets_transmitted++;
 					//moved back
-					recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-					if(ack_buf == (char)seq){
-						wait = 0;
-						printf("\n DATAGRAM ACK RECIEVED\n");
+					while(wait){
+						recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+						if(ack_buf == (char)seq){
+							wait = 0;
+							printf("\n DATAGRAM ACK RECIEVED\n");
+						}
 					}
 				}else{
 					printf("Packet Lost!\n");
