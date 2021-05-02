@@ -132,28 +132,37 @@ int main(int argc, char* argv[]){
         while (1) {
             // receive
             bzero(net_buf, SIZE);
-            //if not ackloss goes here around recvfrom func
-            nBytes = recvfrom(sockfd, net_buf, SIZE,
-                              sendrecvflag, (struct sockaddr*)&addr_con,
-                              &addrlen);
-            // process
-            if (recvFile(net_buf, SIZE)) {
-            	//net_buf = strip_header(net_buf);
-            	fprintf(fp, strip_header(net_buf));
-            	fclose(fp);
-                break;
-           } else {
-		//net_buf = strip_header(net_buf);
-	        fprintf(fp, strip_header(net_buf));
-	    }
+           if(!ack_loss(ack_loss_rate)){
+				nBytes = recvfrom(sockfd, net_buf, SIZE,
+								  sendrecvflag, (struct sockaddr*)&addr_con,
+								  &addrlen);
+				// process
+				if (recvFile(net_buf, SIZE)) {
+					//net_buf = strip_header(net_buf);
+					fprintf(fp, strip_header(net_buf));
+					fclose(fp);
+					break;
+			   } else {
+			//net_buf = strip_header(net_buf);
+				fprintf(fp, strip_header(net_buf));
+			   }
+			good_acks++;
+           }else{
+        	printf("Ack dropped\n");
+        	dropped_acks++;
+        }
      }
         printf("\n-------------------------------\n");
   }
     printf("\n===SERVER TRANSMISSION REPORT===\n");
-    printf("Packets Received: %d\n", packs_received);
+    printf("Unique Packets Received: %d\n", packs_received);
     printf("Duplicate Packets Received: %d\n", dups_received);
     int total_pack = packs_received + dups_received;
     printf("Total Packets: %d\n", total_pack);
-    printf("");
+    printf("Total Bytes: %d\n", bytes_received);
+    printf("Good Ack Total: %d\n", good_acks);
+    printf("Dropped Ack Total: %d\n", dropped_acks);
+    int total_ack = good_acks + dropped_acks;
+    printf("Total Acks: %d\n", total_ack);
     return 0;
 }
