@@ -49,11 +49,11 @@ int sim_loss(double loss)
 {
 	double simulated = (double) (rand()%100) / 100;
 	if(simulated < loss){
-		printf("Packet was lost. \n");
+		printf("Packet will be lost. \n");
 		return 1;
 	}
 	else{
-		printf("Packet successfully transferred. \n");
+		printf("Packet will be successful. \n");
 		return 0;
 	}
 }
@@ -63,11 +63,11 @@ int sim_ack_loss(double loss)
 {
 	double simulated = (double) (rand()%100) / 100;
 	if(simulated < loss){
-		printf("Packet was lost. \n");
+		printf("Ack will be lost. \n");
 		return 1;
 	}
 	else{
-		printf("Packet successfully transferred. \n");
+		printf("Ack will be successful. \n");
 		return 0;
 	}
 }
