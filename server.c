@@ -169,12 +169,14 @@ int main(int argc, char* argv[])
 			// process
 			wait = 0;
 			while(!wait){
-				if (sendFile(fp, net_buf, SIZE)) {
-					printf("EOF reached\n");
-					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-					packets_transmitted++;
-					done_flag = 1;
-					break;
+				if(!sim_loss(p_loss_rate)){
+					if (sendFile(fp, net_buf, SIZE)) {
+						printf("EOF reached\n");
+						sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+						packets_transmitted++;
+						done_flag = 1;
+						break;
+					}
 				}
 				// send
 				if(!sim_loss(p_loss_rate)){
@@ -187,18 +189,17 @@ int main(int argc, char* argv[])
 					//printf("Waiting for datagram ack w/ seq: %d", seq);
 					packets_transmitted++;
 					//moved back
-					while(wait){
-						recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-						if(ack_buf == (char)seq){
-							wait = 0;
-							printf("\n DATAGRAM ACK RECIEVED\n");
-						}
-					}
 				}else{
 					printf("Packet Lost!\n");
 					dropped_packets++;
 				}
 				clearBuf(net_buf);
+
+				recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+				if(ack_buf == (char)seq){
+					wait = 0;
+					printf("\n DATAGRAM ACK RECIEVED\n");
+				}
 			}
 			if(done_flag){
 				break;
