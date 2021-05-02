@@ -141,7 +141,8 @@ int main(int argc, char* argv[])
 	else
 		printf("\nBinding Failed!\n");
 
-	while (1) {
+	wait = 0;
+	while (!wait) {
 		printf("\nWaiting for file name...\n");
 
 		// receive file name
@@ -187,16 +188,10 @@ int main(int argc, char* argv[])
 				dropped_packets++;
 			}
 			clearBuf(net_buf);
-			while(wait){ //wait for ack
-				printf("\nwaitloop\n");
-				int byte_check = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-				if(byte_check == 0){
-					printf("\n Nothing is going through \n");
-				}
-				if(ack_buf == (char)seq){
-					wait = 0;
-					printf("\n DATAGRAM ACK RECIEVED\n");
-				}
+			recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+			if(ack_buf == (char)seq){
+				wait = 0;
+				printf("\n DATAGRAM ACK RECIEVED\n");
 			}
 		}
 		if (fp != NULL)
