@@ -166,15 +166,10 @@ int main(int argc, char* argv[])
 		while (1) {
 			// process
 			if (sendFile(fp, net_buf, SIZE)) {
-				if(!sim_loss(p_loss_rate)){
-					printf("EOF reached\n");
-					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-					packets_transmitted++;
-					break;
-				}else{
-					printf("Packet Lost!\n");
-					dropped_packets++;
-				}
+				printf("EOF reached\n");
+				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+				packets_transmitted++;
+				break;
 			}
 
 			// send
@@ -194,12 +189,12 @@ int main(int argc, char* argv[])
 						printf("\n DATAGRAM ACK RECIEVED\n");
 					}
 				}
-				clearBuf(net_buf);
 				packets_transmitted++;
 			}else{
 				printf("Packet Lost!\n");
 				dropped_packets++;
 			}
+			clearBuf(net_buf);
 		}
 		if (fp != NULL)
 			fclose(fp);
