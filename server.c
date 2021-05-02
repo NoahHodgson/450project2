@@ -141,8 +141,8 @@ int main(int argc, char* argv[])
 	else
 		printf("\nBinding Failed!\n");
 
-	wait = 0;
-	while (!wait) {
+
+	while (1) {
 		printf("\nWaiting for file name...\n");
 
 		// receive file name
@@ -164,7 +164,8 @@ int main(int argc, char* argv[])
 		else
 			printf("\nFile Successfully opened!\n");
 
-		while (1) {
+		wait = 0;
+		while (!wait) {
 			// process
 			if (sendFile(fp, net_buf, SIZE)) {
 				printf("EOF reached\n");
