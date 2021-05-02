@@ -181,20 +181,22 @@ int main(int argc, char* argv[])
 				wait = 1;
 				//clearBuf(net_buf);
 				//printf("Waiting for datagram ack w/ seq: %d", seq);
-				while(wait){ //wait for ack
-					printf("\nwaitloop\n");
-					recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-					if(ack_buf == (char)seq){
-						wait = 0;
-						printf("\n DATAGRAM ACK RECIEVED\n");
-					}
-				}
+				//HERE
 				packets_transmitted++;
 			}else{
 				printf("Packet Lost!\n");
 				dropped_packets++;
 			}
 			clearBuf(net_buf);
+			//was where 'HERE' is
+			while(wait){ //wait for ack
+				printf("\nwaitloop\n");
+				recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+				if(ack_buf == (char)seq){
+					wait = 0;
+					printf("\n DATAGRAM ACK RECIEVED\n");
+				}
+			}
 		}
 		if (fp != NULL)
 			fclose(fp);
