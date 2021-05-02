@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <stdbool.h>
 #include <unistd.h>
 
 #define IP_PROTOCOL 0
@@ -20,10 +21,25 @@ int dups_received = 0;
 int bytes_received = 0;
 int good_acks = 0;
 int dropped_acks = 0;
+bool seq = 0;
 
 double p_loss_rate;
 double ack_loss_rate;
 int timeout_val;
+
+bool invoke_seq(){
+	seq = !seq;
+return seq;
+}
+
+short buffer_ack(){
+	invoke_seq();
+	if(seq == true){
+	    return 1;
+	} else {
+	    return 0;
+	}
+}
 
 //simulate packet loss by using a random float between 0 and 1.
 int sim_loss(double loss)
@@ -89,7 +105,7 @@ int recvFile(char* buf, int s)
 	    //printf("\nLast char is %c\n", buf[s]);
     return 0;
 }
-  
+
 // driver code
 int main(int argc, char* argv[]){
 	//loading in values that are passed in
@@ -102,17 +118,18 @@ int main(int argc, char* argv[]){
 	int timeout_val = atoi(argv[2]);
 
     int sockfd, nBytes;
+    bool wait; //when waiting for ack
     struct sockaddr_in addr_con;
     int addrlen = sizeof(addr_con);
     addr_con.sin_family = AF_INET;
     addr_con.sin_port = htons(PORT);
     addr_con.sin_addr.s_addr = inet_addr(IP_ADDRESS);
-    char net_buf[SIZE];
+    char net_buf[SIZE]; short ack_buf;
     FILE* fp;
     // socket()
     sockfd = socket(AF_INET, SOCK_DGRAM,
                     IP_PROTOCOL);
-  
+
     if (sockfd < 0)
         printf("\nfile descriptor not received!!\n");
     else
@@ -126,31 +143,39 @@ int main(int argc, char* argv[]){
         sendto(sockfd, net_buf, SIZE,
                sendrecvflag, (struct sockaddr*)&addr_con,
                addrlen);
-
+//need to wait for ack!
+	printf("Sending, stand by for acknowledgement...\n");
+	wait = 1;
+	while(wait){
+	    recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+	    if(ack_buf == seq){//we expect the filename ACK to be zero
+	        wait = 0; //ack_buf = buffer_ack();
+	    }
+	}
+	printf("\nfilename ACK successful, ack = %d\n", ack_buf);
         printf("\n---------Data Received---------\n");
 
         while (1) {
             // receive
             bzero(net_buf, SIZE);
-           if(!ack_loss(ack_loss_rate)){
-				nBytes = recvfrom(sockfd, net_buf, SIZE,
-								  sendrecvflag, (struct sockaddr*)&addr_con,
-								  &addrlen);
-				// process
-				if (recvFile(net_buf, SIZE)) {
-					//net_buf = strip_header(net_buf);
-					fprintf(fp, strip_header(net_buf));
-					fclose(fp);
-					break;
-			   } else {
-			//net_buf = strip_header(net_buf);
-				fprintf(fp, strip_header(net_buf));
-			   }
-			good_acks++;
-           }else{
-        	printf("Ack dropped\n");
-        	dropped_acks++;
-        }
+            //if not ackloss goes here around recvfrom func
+            nBytes = recvfrom(sockfd, net_buf, SIZE,
+                              sendrecvflag, (struct sockaddr*)&addr_con,
+                              &addrlen);
+            // process
+            if (recvFile(net_buf, SIZE)) {
+            	//net_buf = strip_header(net_buf);
+            	fprintf(fp, strip_header(net_buf));
+            	fclose(fp);
+                break;
+           } else {
+		//net_buf = strip_header(net_buf)
+		ack_buf = buffer_ack();//pull seq id
+		printf("\nAck buf = %d\n", ack_buf);
+	        fprintf(fp, strip_header(net_buf)); //parse datagram
+		sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+		printf("DATAGRAM ACK SENT\n");
+	    }//loopback to recvfrom
      }
         printf("\n-------------------------------\n");
   }
