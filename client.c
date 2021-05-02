@@ -154,7 +154,7 @@ int main(int argc, char* argv[]){
 		}
 		printf("\nfilename ACK successful, ack = %d\n", ack_buf);
 		printf("\n---------Data Received---------\n");
-
+		int done_flag = 0;
 		while (1) {
 			// receive
 			bzero(net_buf, SIZE);
@@ -166,6 +166,7 @@ int main(int argc, char* argv[]){
 				//net_buf = strip_header(net_buf);
 				fprintf(fp, strip_header(net_buf));
 				fclose(fp);
+				done_flag = 1;
 				break;
 			} else {
 				//net_buf = strip_header(net_buf)
@@ -181,6 +182,9 @@ int main(int argc, char* argv[]){
 			}//loopback to recvfrom
 		}
 		printf("\n-------------------------------\n");
+		if(done_flag){
+			break;
+		}
 	}
 	printf("\n===SERVER TRANSMISSION REPORT===\n");
 	printf("Unique Packets Received: %d\n", packs_received);

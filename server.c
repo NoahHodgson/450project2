@@ -164,6 +164,7 @@ int main(int argc, char* argv[])
 		else
 			printf("\nFile Successfully opened!\n");
 
+		int done_flag=0;
 		while (1) {
 			// process
 			wait = 0;
@@ -172,6 +173,7 @@ int main(int argc, char* argv[])
 					printf("EOF reached\n");
 					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 					packets_transmitted++;
+					done_flag = 1;
 					break;
 				}
 				// send
@@ -199,6 +201,9 @@ int main(int argc, char* argv[])
 		}
 		if (fp != NULL)
 			fclose(fp);
+		if(done_flag){
+			break;
+		}
 	}
 	//printing required values
 	printf("\n===SERVER TRANSMISSION REPORT===\n");
