@@ -164,35 +164,36 @@ int main(int argc, char* argv[])
 		else
 			printf("\nFile Successfully opened!\n");
 
-		wait = 0;
-		while (!wait) {
+		while (1) {
 			// process
-			if (sendFile(fp, net_buf, SIZE)) {
-				printf("EOF reached\n");
-				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-				packets_transmitted++;
-				break;
-			}
-
-			// send
-			if(!sim_loss(p_loss_rate)){
-				printf("Enter send conditional\n");
-				sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
-				printf("datagram transfer complete\n");
-				printf("waiting for ack w/ seq: %d", seq);
-				wait = 1;
-				//clearBuf(net_buf);
-				//printf("Waiting for datagram ack w/ seq: %d", seq);
-				packets_transmitted++;
-			}else{
-				printf("Packet Lost!\n");
-				dropped_packets++;
-			}
-			clearBuf(net_buf);
-			recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-			if(ack_buf == (char)seq){
-				wait = 0;
-				printf("\n DATAGRAM ACK RECIEVED\n");
+			wait = 0;
+			while(!wait){
+				if (sendFile(fp, net_buf, SIZE)) {
+					printf("EOF reached\n");
+					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+					packets_transmitted++;
+					break;
+				}
+				// send
+				if(!sim_loss(p_loss_rate)){
+					printf("Enter send conditional\n");
+					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
+					printf("datagram transfer complete\n");
+					printf("waiting for ack w/ seq: %d", seq);
+					wait = 1;
+					//clearBuf(net_buf);
+					//printf("Waiting for datagram ack w/ seq: %d", seq);
+					packets_transmitted++;
+				}else{
+					printf("Packet Lost!\n");
+					dropped_packets++;
+				}
+				clearBuf(net_buf);
+				recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+				if(ack_buf == (char)seq){
+					wait = 0;
+					printf("\n DATAGRAM ACK RECIEVED\n");
+				}
 			}
 		}
 		if (fp != NULL)
