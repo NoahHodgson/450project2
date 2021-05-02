@@ -122,9 +122,9 @@ int main(int argc, char* argv[])
 		printf("Error, program requires arg for packet loss, ack loss, and timeout value to run.");
 		return -1;
 	}
-	double p_loss_rate = atof(argv[0]);
-	double ack_loss_rate = atof(argv[1]);
-	int timeout_val = atoi(argv[2]);
+	double p_loss_rate = atof(argv[1]);
+	double ack_loss_rate = atof(argv[2]);
+	int timeout_val = atoi(argv[3]);
 
 
 	// socket()
