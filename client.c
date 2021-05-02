@@ -186,7 +186,7 @@ int main(int argc, char* argv[]){
 			break;
 		}
 	}
-	printf("\n===SERVER TRANSMISSION REPORT===\n");
+	printf("\n===CLIENT TRANSMISSION REPORT===\n");
 	printf("Unique Packets Received: %d\n", packs_received);
 	printf("Duplicate Packets Received: %d\n", dups_received);
 	int total_pack = packs_received + dups_received;

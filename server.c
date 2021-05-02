@@ -198,6 +198,9 @@ int main(int argc, char* argv[])
 				}
 				clearBuf(net_buf);
 			}
+			if(done_flag){
+				break;
+			}
 		}
 		if (fp != NULL)
 			fclose(fp);
