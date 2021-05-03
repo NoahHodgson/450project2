@@ -169,15 +169,15 @@ int main(int argc, char* argv[])
 			// process
 			wait = 0;
 			while(!wait){
+				if (sendFile(fp, net_buf, SIZE)) {
+					printf("EOF reached\n");
+					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+					packets_transmitted++;
+					done_flag = 1;
+					break;
+				}
+				printf("Enter send conditional\n");
 				if(!sim_loss(p_loss_rate)){
-					if (sendFile(fp, net_buf, SIZE)) {
-						printf("EOF reached\n");
-						sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-						packets_transmitted++;
-						done_flag = 1;
-						break;
-					}
-					printf("Enter send conditional\n");
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("datagram transfer complete\n");
 					printf("waiting for ack w/ seq: %d\n", seq);
