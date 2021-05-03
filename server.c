@@ -205,6 +205,7 @@ int main(int argc, char* argv[])
 				if(timeout<0){
 					timeout_count++;
 					fseek(fp, -80L, SEEK_CUR);
+					printf("\n You timed out\n")
 					//FIXME what should happen next is that we deincrement something here to resend the packet
 					//whose ack was lost. currently we do that for simulating packet loss, but I don't know
 					//how to do that when we have already sent the packet for ack loss, without breaking it for packet loss.
