@@ -180,7 +180,7 @@ int main(int argc, char* argv[]){
 						fprintf(fp, strip_header(net_buf)); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
-						ack_buf = buffer_ack();//moved so it changes after it is sent and not before
+						ack_buf = buffer_ack();//moved so it changes after
 						printf("DATAGRAM ACK SENT\n");
 					}else{
 						printf("ACK LOST\n");
