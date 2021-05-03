@@ -182,6 +182,7 @@ int main(int argc, char* argv[]){
 						printf("DATAGRAM ACK SENT\n");
 					}else{
 						printf("ACK LOST\n");
+						invoke_seq();
 						dropped_acks++;
 					}
 				}else{

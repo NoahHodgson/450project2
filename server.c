@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
 					//moved back
 				}else{
 					printf("Packet Lost!\n");
-					fseek(fp, 80L, SEEK_CUR);
+					fseek(fp, 80L, SEEK_CUR); //this would happen if packet sent and was lost
 					invoke_seq(); //this would happen if packet sent and was lost
 					dropped_packets++;
 				}
