@@ -126,9 +126,16 @@ int main(int argc, char* argv[])
 	double ack_loss_rate = atof(argv[2]);
 	int timeout_val = atoi(argv[3]);
 
-
 	// socket()
 	sockfd = socket(AF_INET, SOCK_DGRAM, IP_PROTOCOL);
+
+	//timeout
+	struct timeval timeout;
+	timeout.tv_sec = timeout_val;
+	timeout.tv_usec = 0;
+	setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout))
+
+
 
 	if (sockfd < 0)
 		printf("\nfile descriptor not received!!\n");
@@ -192,15 +199,17 @@ int main(int argc, char* argv[])
 					dropped_packets++;
 				}
 				clearBuf(net_buf);
-				int is_timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-				if(is_timeout >= 0){
+
+				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+				if(timeout<0){
+					timeout_count++;
+				}
+				else{
 					if(ack_buf == (char)seq){
 						wait = 0;
 						printf("\n DATAGRAM ACK RECIEVED\n");
+						ack_count++;
 					}
-				}else{
-					wait = 0;
-					timeout_count++;
 				}
 			}
 			if(done_flag){
