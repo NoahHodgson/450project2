@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 	struct timeval timeout;
 	timeout.tv_sec = timeout_val;
 	timeout.tv_usec = 0;
-	setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout))
+	setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 
 
 
