@@ -172,6 +172,7 @@ int main(int argc, char* argv[])
 			printf("\nFile Successfully opened!\n");
 
 		int done_flag=0;
+		ack_buf = buffer_ack();
 		while (1) {
 			// process
 			wait = 0;
