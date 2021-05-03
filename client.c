@@ -155,6 +155,7 @@ int main(int argc, char* argv[]){
 		printf("\nfilename ACK successful, ack = %d\n", ack_buf);
 		printf("\n---------Data Received---------\n");
 		int done_flag = 0;
+		printf("\n\n %d \n\n", ack_buf);
 		while (1) {
 			// receive
 			bzero(net_buf, SIZE);
