@@ -174,7 +174,6 @@ int main(int argc, char* argv[])
 			printf("\nFile Successfully opened!\n");
 
 		int done_flag=0;
-		printf("\n\n %d \n\n", ack_buf);
 		ack_buf = buffer_ack();
 		while (1) {
 			// process
