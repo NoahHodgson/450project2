@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 				}
 				clearBuf(net_buf);
 				int is_timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-				if(is_timeout > 0){
+				if(is_timeout >= 0){
 					if(ack_buf == (char)seq){
 						wait = 0;
 						printf("\n DATAGRAM ACK RECIEVED\n");
