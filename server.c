@@ -102,7 +102,7 @@ int sendFile(FILE* fp, char* buf, int s)
 	}
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
-	buf[1] = invoke_seq(invoke_seq()); //FIXME this is joke
+	buf[1] = invoke_seq(); //
 	return 0;
 }
 // driver code
@@ -153,17 +153,19 @@ int main(int argc, char* argv[])
 		printf("\nWaiting for file name...\n");
 
 		// receive file name
-		clearBuf(net_buf);
+		clearBuf(net_buf); wait = 1;
+		while(wait){
 		nBytes = recvfrom(sockfd, net_buf,
 				SIZE, sendrecvflag,
 				(struct sockaddr*)&addr_con, &addrlen);
 
 		if(nBytes > 0){ //if we recieve name, we need to ack with 0!
+			wait = 0;
 			ack_buf = buffer_ack();
-			printf("filename acK: %d \n", ack_buf);
+			printf("filename ack: %d \n", ack_buf);
 			sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 		}
-
+		}
 		fp = fopen(net_buf, "r");
 		printf("\nFile Name Received: %s\n", net_buf);
 		if (fp == NULL)
@@ -172,11 +174,11 @@ int main(int argc, char* argv[])
 			printf("\nFile Successfully opened!\n");
 
 		int done_flag=0;
-		ack_buf = buffer_ack();
 		while (1) {
 			// process
 			wait = 0;
 			while(!wait){
+			RESEND:
 				if (sendFile(fp, net_buf, SIZE)) {
 					printf("EOF reached\n");
 					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
@@ -184,6 +186,7 @@ int main(int argc, char* argv[])
 					done_flag = 1;
 					break;
 				}
+//RESEND:
 				printf("Enter send conditional\n");
 				if(!sim_loss(p_loss_rate)){
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
@@ -196,7 +199,7 @@ int main(int argc, char* argv[])
 					//moved back
 				}else{
 					printf("Packet Lost!\n");
-					fseek(fp, 80L, SEEK_CUR); //this would happen if packet sent and was lost
+					//fseek(fp, 80L, SEEK_CUR); //now we wait for timeout with no ack
 					//this would happen if packet sent and was lost
 					dropped_packets++;
 				}
@@ -206,7 +209,9 @@ int main(int argc, char* argv[])
 				if(timeout<0){
 					timeout_count++;
 					fseek(fp, -80L, SEEK_CUR);
-					printf("\n You timed out\n");
+					printf("\n You timed out\n");//timeout waiting for ack
+					//invoke_seq(); //rollback seq number
+					goto RESEND; //resend packet
 					//FIXME what should happen next is that we deincrement something here to resend the packet
 					//whose ack was lost. currently we do that for simulating packet loss, but I don't know
 					//how to do that when we have already sent the packet for ack loss, without breaking it for packet loss.
