@@ -193,6 +193,7 @@ int main(int argc, char* argv[])
 					}
 				}else{
 					printf("Packet Lost!\n");
+					invoke_seq();
 					dropped_packets++;
 				}
 				clearBuf(net_buf);
