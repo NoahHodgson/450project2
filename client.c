@@ -183,7 +183,7 @@ int main(int argc, char* argv[]){
 					printf("ACK LOST\n");
 					dropped_acks++;
 				}
-				//else we go here and just send the acknowledgement like normal
+				//else we go here and just send the acknowledgement and don't write to file
 			}//loopback to recvfrom
 		}
 		printf("\n-------------------------------\n");
