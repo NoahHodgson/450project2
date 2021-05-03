@@ -177,9 +177,6 @@ int main(int argc, char* argv[])
 						done_flag = 1;
 						break;
 					}
-				}
-				// send
-				if(!sim_loss(p_loss_rate)){
 					printf("Enter send conditional\n");
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("datagram transfer complete\n");
