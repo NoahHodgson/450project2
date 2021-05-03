@@ -168,20 +168,26 @@ int main(int argc, char* argv[]){
 				fclose(fp);
 				done_flag = 1;
 				break;
-
-			//FIXME so if the packet we received is in sequence we go here
-			} else {
-				//net_buf = strip_header(net_buf)
-				if(!sim_ack_loss(ack_loss_rate)){
-					ack_buf = buffer_ack();//pull seq id
-					printf("\nAck buf = %d\n", ack_buf);
-					fprintf(fp, strip_header(net_buf)); //parse datagram
-					sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
-					good_acks++;
-					printf("DATAGRAM ACK SENT\n");
+			}
+			else {
+				if(ack_buf == seq){
+					//net_buf = strip_header(net_buf)
+					packs_received++;
+					if(!sim_ack_loss(ack_loss_rate)){
+						ack_buf = buffer_ack();//pull seq id
+						printf("\nAck buf = %d\n", ack_buf);
+						fprintf(fp, strip_header(net_buf)); //parse datagram
+						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+						good_acks++;
+						printf("DATAGRAM ACK SENT\n");
+					}else{
+						printf("ACK LOST\n");
+						dropped_acks++;
+					}
 				}else{
-					printf("ACK LOST\n");
-					dropped_acks++;
+					printf("Duplicate packet\n");
+					sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number to show that I know it was sent out of order
+					dups_received++;
 				}
 				//else we go here and just send the acknowledgement and don't write to file
 			}//loopback to recvfrom

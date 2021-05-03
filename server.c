@@ -195,6 +195,7 @@ int main(int argc, char* argv[])
 					//moved back
 				}else{
 					printf("Packet Lost!\n");
+					fseek(fp, 80L, SEEK_CUR);
 					invoke_seq(); //this would happen if packet sent and was lost
 					dropped_packets++;
 				}
@@ -203,6 +204,7 @@ int main(int argc, char* argv[])
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
 				if(timeout<0){
 					timeout_count++;
+					fseek(fp, -80L, SEEK_CUR);
 					//FIXME what should happen next is that we deincrement something here to resend the packet
 					//whose ack was lost. currently we do that for simulating packet loss, but I don't know
 					//how to do that when we have already sent the packet for ack loss, without breaking it for packet loss.
