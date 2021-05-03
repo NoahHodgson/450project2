@@ -98,9 +98,9 @@ int recvFile(char* buf, int s)
 		if (ch == EOF)
 			return 1;
 		else if (ch == '\0')
-			printf("%s", "/0");
+			printf("%s\n", "/0");
 		else
-			printf("%c",ch);
+			printf("%c\n",ch);
 	}       //printf("%c", '\t');//tab between each recv'd packet
 	//printf("\nLast char is %c\n", buf[s]);
 	return 0;
