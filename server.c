@@ -186,17 +186,21 @@ int main(int argc, char* argv[])
 					//printf("Waiting for datagram ack w/ seq: %d", seq);
 					packets_transmitted++;
 					//moved back
-					recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-					if(ack_buf == (char)seq){
-						wait = 0;
-						printf("\n DATAGRAM ACK RECIEVED\n");
-					}
 				}else{
 					printf("Packet Lost!\n");
 					invoke_seq();
 					dropped_packets++;
 				}
 				clearBuf(net_buf);
+				int is_timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
+				if(is_timeout > 0){
+					if(ack_buf == (char)seq){
+						wait = 0;
+						printf("\n DATAGRAM ACK RECIEVED\n");
+					}
+				}else{
+					timeout_count++;
+				}
 			}
 			if(done_flag){
 				break;
