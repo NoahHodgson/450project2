@@ -171,7 +171,7 @@ int main(int argc, char* argv[]){
 				break;
 			}
 			else {
-				if(ack_buf == seq){
+				if(ack_buf != seq){
 					//net_buf = strip_header(net_buf)
 					packs_received++;
 					if(!sim_ack_loss(ack_loss_rate)){
