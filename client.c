@@ -171,6 +171,7 @@ int main(int argc, char* argv[]){
 				break;
 			}
 			else {
+				printf("%d buf, %d seq", ack_buf, seq);
 				if(ack_buf == seq){
 					//net_buf = strip_header(net_buf)
 					packs_received++;
