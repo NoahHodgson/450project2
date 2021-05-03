@@ -102,7 +102,7 @@ int sendFile(FILE* fp, char* buf, int s)
 	}
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
-	buf[1] = invoke_seq();
+	buf[1] = invoke_seq(invoke_seq()); //FIXME this is joke
 	return 0;
 }
 // driver code
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 				}else{
 					printf("Packet Lost!\n");
 					fseek(fp, 80L, SEEK_CUR); //this would happen if packet sent and was lost
-					invoke_seq(); //this would happen if packet sent and was lost
+					//this would happen if packet sent and was lost
 					dropped_packets++;
 				}
 				clearBuf(net_buf);
@@ -214,6 +214,7 @@ int main(int argc, char* argv[])
 					if(ack_buf == (char)seq){
 						wait = 0;
 						printf("\n DATAGRAM ACK RECIEVED\n");
+						invoke_seq();
 						ack_count++;
 					}
 				}
