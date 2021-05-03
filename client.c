@@ -175,11 +175,12 @@ int main(int argc, char* argv[]){
 					//net_buf = strip_header(net_buf)
 					packs_received++;
 					if(!sim_ack_loss(ack_loss_rate)){
-						ack_buf = buffer_ack();//pull seq id
+						//pull seq id
 						printf("\nAck buf = %d\n", ack_buf);
 						fprintf(fp, strip_header(net_buf)); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
+						ack_buf = buffer_ack();//moved so it changes after it is sent and not before
 						printf("DATAGRAM ACK SENT\n");
 					}else{
 						printf("ACK LOST\n");
