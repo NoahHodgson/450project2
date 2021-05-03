@@ -199,6 +199,7 @@ int main(int argc, char* argv[])
 						printf("\n DATAGRAM ACK RECIEVED\n");
 					}
 				}else{
+					wait = 0;
 					timeout_count++;
 				}
 			}
