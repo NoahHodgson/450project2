@@ -175,9 +175,11 @@ int main(int argc, char* argv[]){
 					printf("\nAck buf = %d\n", ack_buf);
 					fprintf(fp, strip_header(net_buf)); //parse datagram
 					sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+					good_acks++;
 					printf("DATAGRAM ACK SENT\n");
 				}else{
 					printf("ACK LOST\n");
+					dropped_acks++;
 				}
 			}//loopback to recvfrom
 		}
