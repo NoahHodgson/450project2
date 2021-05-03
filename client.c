@@ -168,6 +168,8 @@ int main(int argc, char* argv[]){
 				fclose(fp);
 				done_flag = 1;
 				break;
+
+			//FIXME so if the packet we received is in sequence we go here
 			} else {
 				//net_buf = strip_header(net_buf)
 				if(!sim_ack_loss(ack_loss_rate)){
@@ -181,6 +183,7 @@ int main(int argc, char* argv[]){
 					printf("ACK LOST\n");
 					dropped_acks++;
 				}
+				//else we go here and just send the acknowledgement like normal
 			}//loopback to recvfrom
 		}
 		printf("\n-------------------------------\n");
