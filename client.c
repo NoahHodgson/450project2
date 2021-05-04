@@ -162,7 +162,7 @@ int main(int argc, char* argv[]){
 			// process
 			if (recvFile(net_buf, SIZE)) {
 				//net_buf = strip_header(net_buf);
-				fputs(fp, strip_header(net_buf));
+				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
 				break;
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]){
 						char* readin = (char*) malloc(81*sizeof(char));
 						readin = strip_header(net_buf);
 						printf(readin);
-						fputs(fp, readin); //parse datagram
+						fputs(readin, fp); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
 						printf("DATAGRAM ACK SENT\n");
