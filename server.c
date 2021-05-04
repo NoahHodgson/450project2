@@ -23,7 +23,7 @@ int retrans = 0;
 int ploss = 0;
 int successes = 0;
 int timedout = 0;
-seq = 0;
+int seq = 1;
 
 double p_loss_rate;
 double ack_loss_rate;
