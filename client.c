@@ -176,6 +176,7 @@ int main(int argc, char* argv[]){
 						printf("\nAck buf = %d\n", ack_buf);
 						char* readin = (char*) malloc(81*sizeof(char));
 						readin = strip_header(net_buf);
+						printf(readin);
 						fprintf(fp, readin); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
