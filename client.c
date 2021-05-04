@@ -79,7 +79,7 @@ void clearBuf(char* b)
 
 //function to strip header information
 char* strip_header(char* buffer){
-	char* b[81];
+	char* b = (char*) malloc(81*sizeof(char));
 	strncpy(b, &buffer[2]);
 	return b;
 }
@@ -162,7 +162,7 @@ int main(int argc, char* argv[]){
 			// process
 			if (recvFile(net_buf, SIZE)) {
 				//net_buf = strip_header(net_buf);
-				fprintf(fp, strip_header(net_buf));
+				fputs(fp, strip_header(net_buf));
 				fclose(fp);
 				done_flag = 1;
 				break;
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]){
 						char* readin = (char*) malloc(81*sizeof(char));
 						readin = strip_header(net_buf);
 						printf(readin);
-						fprintf(fp, readin); //parse datagram
+						fputs(fp, readin); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
 						printf("DATAGRAM ACK SENT\n");
