@@ -81,6 +81,7 @@ void clearBuf(char* b)
 char* strip_header(char* buffer){
 	char* b = (char*) malloc(81*sizeof(char));
 	strcpy(b, &buffer[2]);
+	b[81] = '\0';
 	return b;
 }
 
