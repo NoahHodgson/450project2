@@ -79,8 +79,8 @@ void clearBuf(char* b)
 
 //function to strip header information
 char* strip_header(char* buffer){
-	char* b[80];
-	strncpy(b, buffer, 80);
+	char* b[81];
+	strncpy(b, &buffer[2]);
 	return b;
 }
 
