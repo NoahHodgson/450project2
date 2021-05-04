@@ -100,7 +100,7 @@ int recvFile(char* buf, int s)
 			count++;
 			printf("%c",ch);
 	}       printf("%c", '\n');//tab between each recv'd packet
-	byte_total+=count+4;
+	byte_total += (count+4);
 	//printf("\nLast char is %c\n", buf[s]);
 	return 0;
 }
