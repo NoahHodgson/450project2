@@ -49,11 +49,11 @@ int sim_loss(double loss)
 {
 	double simulated = (double) (rand()%100) / 100;
 	if(simulated < loss){
-		printf("Packet will be lost. \n");
+		//printf("Packet will be lost. \n");
 		return 1;
 	}
 	else{
-		printf("Packet will be successful. \n");
+		//printf("Packet will be successful. \n");
 		return 0;
 	}
 }
@@ -63,11 +63,11 @@ int sim_ack_loss(double loss)
 {
 	double simulated = (double) (rand()%100) / 100;
 	if(simulated < loss){
-		printf("Ack will be lost. \n");
+		//printf("Ack will be lost. \n");
 		return 1;
 	}
 	else{
-		printf("Ack will be successful. \n");
+		//printf("Ack will be successful. \n");
 		return 0;
 	}
 }
@@ -103,6 +103,7 @@ int sendFile(FILE* fp, char* buf, int s)
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
 	buf[1] = invoke_seq(); //flip every time
+	printf("Packet %d generated with %d data bytes\n", buf[1], buf[0]);
 	bytes_transmitted += (count + 4); //"four" header bytes plus datagram
 	return 0;
 }
@@ -184,22 +185,21 @@ int main(int argc, char* argv[])
 			RESEND:
 			if (sendFile(fp, net_buf, SIZE)) {
 				successes++;
-				printf("EOF reached\n");
+				printf("EOF reached, seq: %d\n", seq);
 				wait = 1;
 				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 				done_flag = 1;
 				break;
 			}
-			printf("Enter send conditional\n");
-
+				//SEND CONDITION
 				if(!sim_loss(p_loss_rate)){
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
-					printf("datagram transfer complete\n");
+					printf("Packet %d successfully transmitted with %d bytes\n", seq, sizeof(net_buf));
 					printf("waiting for ack w/ seq: %d\n", seq);
 					successes++;
 					//moved back
 				}else{
-					printf("Packet Lost!\n");
+					printf("Packet %d Lost!\n", seq);
 					ploss++;
 					invoke_seq(); //need to roll back sequence number once
 					//fseek(fp, 80L, SEEK_CUR); //now we wait for timeout with no ack
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
 				if(timeout<0){//if NO ACK
 					fseek(fp, -80L, SEEK_CUR);
-					printf("\n You timed out\n");//timeout waiting for ack
+					printf("\nTimeout expired for packet numbered %d\n", seq);//timeout waiting for ack
 					int count;
 					for (int i = 2; i < SIZE; i++) {
 							char ch = fgetc(fp);
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
-					printf("\n DATAGRAM ACK RECIEVED\n");
+					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
 					ack_count++;
 				}
 			} if(done_flag){ break; }
