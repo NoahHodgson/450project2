@@ -22,6 +22,7 @@ int bytes_received = 0;
 int good_acks = 0;
 int dropped_acks = 0;
 bool seq = 0;
+int byte_total = 0;
 
 double p_loss_rate;
 double ack_loss_rate;
@@ -90,13 +91,16 @@ int recvFile(char* buf, int s)
 	char ch;
 	printf("\nPacket size: %d\t, seq: %d\n",buf[0], buf[1]);
 	//	buf[0] = ""; buf[1] = "";
+	int count;
 	for (i = 2; i < s; i++) {
 		ch = buf[i];
 		if (ch == EOF)
 			return 1;
 		else
+			count++;
 			printf("%c",ch);
 	}       printf("%c", '\n');//tab between each recv'd packet
+	byte_total+=count+4;
 	//printf("\nLast char is %c\n", buf[s]);
 	return 0;
 }
@@ -165,9 +169,9 @@ int main(int argc, char* argv[]){
 				break;
 			}
 			else {
+				packs_received++;
 				if(ack_buf == seq){
 					//net_buf = strip_header(net_buf)
-					packs_received++;
 					if(!sim_ack_loss(ack_loss_rate)){
 						ack_buf = buffer_ack();//pull seq id
 						printf("\nAck buf = %d\n", ack_buf);
@@ -185,6 +189,7 @@ int main(int argc, char* argv[]){
 					}
 				}else{
 					printf("Duplicate packet\n");
+					byte_total-=84;
 					sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number to show that I know it was sent out of order
 					dups_received++;
 				}
@@ -197,10 +202,10 @@ int main(int argc, char* argv[]){
 		}
 	}
 	printf("\n===CLIENT TRANSMISSION REPORT===\n");
-	printf("Unique Packets Received: %d\n", packs_received);
+	printf("All Packets Received: %d\n", packs_received);
 	printf("Duplicate Packets Received: %d\n", dups_received);
-	int total_pack = packs_received + dups_received;
-	printf("Total Packets: %d\n", total_pack);
+	int total_pack = packs_received - dups_received;
+	printf("Total Packets - Duplicates: %d\n", total_pack);
 	printf("Total Bytes: %d\n", bytes_received);
 	printf("Good Ack Total: %d\n", good_acks);
 	printf("Dropped Ack Total: %d\n", dropped_acks);

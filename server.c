@@ -243,9 +243,9 @@ int main(int argc, char* argv[])
 	printf("Databytes generated for original transmission: %d\n", bytes_transmitted);
 	int retrans_full = retrans + init_datapacket_num;
 	printf("Retransmitted packets (retrans+init) generated: %d\n", retrans_full);
-	printf("Databytes generated for original transmission: %d\n", bytes_transmitted);
 	printf("Number of Lost Packets: %d\n", ploss);
 	printf("Number of Successful Transmissions: %d\n", successes);
+	printf("Number of ACKs: %d\n", ack_count);
 	printf("Number of Timeouts: %d\n", timedout);
 	return 0;
 }
