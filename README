@@ -32,7 +32,7 @@ to compile:
 make all
 
 to run:
-make client [packet loss rate] [ack loss rate] [timeout value]
-make server [packet loss rate] [ack loss rate] [timeout value]
+./client.o [packet loss rate] [ack loss rate] [timeout value]
+./server.o [packet loss rate] [ack loss rate] [timeout value]
 
 Then enter send.txt into the client window.
