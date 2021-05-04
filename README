@@ -1,0 +1,38 @@
+CISC 450 / CPEG 419
+Computer Networks I
+Project 2
+
+Created by
+Trevor Roe and Noah Hodghson
+
+
+
+README:
+
+Included are several files composing our UDP data transfer protocol to send a basic text file over the internet
+using UDP. We have implemented a rudimentary ack-based reliable data transfer protocol predicated on the notion
+that each transmitted packet must be acknowledged by the reciever before the sender will continue transmitting.
+
+Files included:
+client.c
+server.c
+README
+send.txt
+makefile
+
+It is worth noting that send.txt is the first two paragraphs of J.R.R. Tolkien's 'The Hobbit.'
+
+To run this program, please install GCC and open this directory in bash. The github repository can be found at:
+https://github.com/NoahHoghson/450Project2.git
+
+After pulling the repo, using the makefile you can simply open two bash terminal windows, navigate to the directory
+and type:
+
+to compile:
+make all
+
+to run:
+make client [packet loss rate] [ack loss rate] [timeout value]
+make server [packet loss rate] [ack loss rate] [timeout value]
+
+Then enter send.txt into the client window.
