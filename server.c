@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
 					timeout_count++;
 					fseek(fp, -80L, SEEK_CUR);
 					printf("\n You timed out\n");//timeout waiting for ack
-					invoke_seq(); //rollback seq number
+					//invoke_seq(); //rollback seq number
 					goto RESEND; //resend packet
 					//FIXME what should happen next is that we deincrement something here to resend the packet
 					//whose ack was lost. currently we do that for simulating packet loss, but I don't know

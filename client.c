@@ -1,4 +1,5 @@
 // client code for UDP socket programming
+//Noah Hodgson and Trevor Roe, CISC 450 Project 2
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -170,16 +171,14 @@ int main(int argc, char* argv[]){
 				break;
 			}
 			else {
-				printf("%d buf, %d seq", ack_buf, seq);
 				if(ack_buf == seq){
 					//net_buf = strip_header(net_buf)
 					packs_received++;
 					if(!sim_ack_loss(ack_loss_rate)){
-						//pull seq id
+						ack_buf = buffer_ack();//pull seq id
 						printf("\nAck buf = %d\n", ack_buf);
 						fprintf(fp, strip_header(net_buf)); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
-						ack_buf = buffer_ack();
 						good_acks++;
 						printf("DATAGRAM ACK SENT\n");
 					}else{
