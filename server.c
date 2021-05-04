@@ -1,4 +1,4 @@
-// server code for UDP socket programming
+//server code for UDP socket programming
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -54,6 +54,8 @@ int sim_loss(double loss)
 	}
 	else{
 		printf("Packet will be successful. \n");
+		datapacket_num++;
+		suc_packets++;
 		return 0;
 	}
 }
@@ -102,7 +104,8 @@ int sendFile(FILE* fp, char* buf, int s)
 	}
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
-	buf[1] = invoke_seq(); //
+	buf[1] = invoke_seq(); //flip every time
+	bytes_transmitted += (count + 4); //"four" header bytes plus datagram
 	return 0;
 }
 // driver code
@@ -180,60 +183,50 @@ int main(int argc, char* argv[])
 			wait = 0;
 			while(!wait){
 			RESEND:
-				if (sendFile(fp, net_buf, SIZE)) {
-					printf("EOF reached\n");
-					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-					packets_transmitted++;
-					done_flag = 1;
-					break;
-				}
-//RESEND:
-				printf("Enter send conditional\n");
+			if (sendFile(fp, net_buf, SIZE)) {
+				printf("EOF reached\n");
+				wait = 1;
+				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+				packets_transmitted++;
+				done_flag = 1;
+				break;
+			}
+			printf("Enter send conditional\n");
+
 				if(!sim_loss(p_loss_rate)){
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("datagram transfer complete\n");
 					printf("waiting for ack w/ seq: %d\n", seq);
-					wait = 1;
-					//clearBuf(net_buf);
-					//printf("Waiting for datagram ack w/ seq: %d", seq);
 					packets_transmitted++;
 					//moved back
 				}else{
 					printf("Packet Lost!\n");
+					invoke_seq(); //need to roll back sequence number once
 					//fseek(fp, 80L, SEEK_CUR); //now we wait for timeout with no ack
 					//this would happen if packet sent and was lost
 					dropped_packets++;
 				}
 				clearBuf(net_buf);
-
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-				if(timeout<0){
+
+				if(timeout<0){//if NO ACK
 					timeout_count++;
 					fseek(fp, -80L, SEEK_CUR);
 					printf("\n You timed out\n");//timeout waiting for ack
-					//invoke_seq(); //rollback seq number
+					invoke_seq(); //rollback seq number
 					goto RESEND; //resend packet
-					//FIXME what should happen next is that we deincrement something here to resend the packet
-					//whose ack was lost. currently we do that for simulating packet loss, but I don't know
-					//how to do that when we have already sent the packet for ack loss, without breaking it for packet loss.
+
+				}else{ //otherwise YES WE GOT AN ACK
+					wait = 1;
+					printf("\n DATAGRAM ACK RECIEVED\n");
+					ack_count++;
 				}
-				else{
-					if(ack_buf == (char)seq){
-						wait = 0;
-						printf("\n DATAGRAM ACK RECIEVED\n");
-						invoke_seq();
-						ack_count++;
-					}
-				}
-			}
-			if(done_flag){
-				break;
-			}
+			} if(done_flag){ break; }
 		}
 		if (fp != NULL)
 			fclose(fp);
 		if(done_flag){
-			break;
+		break;
 		}
 	}
 	//printing required values

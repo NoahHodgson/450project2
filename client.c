@@ -1,5 +1,4 @@
 // client code for UDP socket programming
-//Noah Hodgson and Trevor Roe, CISC 450 Project 2
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -80,11 +79,9 @@ void clearBuf(char* b)
 
 //function to strip header information
 char* strip_header(char* buffer){
-	for(int i=0;i<SIZE-2;i++){
-		buffer[i] = buffer[i+2];}
-	buffer[SIZE-1] = '\0';
-	buffer[SIZE] = '\0';
-	return buffer;
+	char* b[80];
+	strncpy(b, buffer, 80);
+	return b;
 }
 
 // function to receive file
