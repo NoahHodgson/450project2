@@ -47,11 +47,11 @@ int sim_loss(double loss)
 {
 	double simulated = (double) (rand()%100) / 100;
 	if(simulated < loss){
-		printf("Packet will be lost. \n");
+		//printf("Packet will be lost. \n");
 		return 1;
 	}
 	else{
-		printf("Packet will be successful. \n");
+		//printf("Packet will be successful. \n");
 		return 0;
 	}
 }
@@ -61,11 +61,11 @@ int sim_ack_loss(double loss)
 {
 	double simulated = (double) (rand()%100) / 100;
 	if(simulated < loss){
-		printf("Ack will be lost. \n");
+		//printf("Ack will be lost. \n");
 		return 1;
 	}
 	else{
-		printf("Ack will be successful. \n");
+		//printf("Ack will be successful. \n");
 		return 0;
 	}
 }
@@ -89,19 +89,15 @@ int recvFile(char* buf, int s)
 {
 	int i;
 	char ch;
-	printf("\nPacket size: %d\t, seq: %d\n",buf[0], buf[1]);
-	//	buf[0] = ""; buf[1] = "";
+	printf("\nPacket %d recieved with %d data bytes\n",buf[1], buf[0]+2);
 	int count;
 	for (i = 2; i < s; i++) {
 		ch = buf[i];
 		if (ch == EOF)
-			return 1;
+		    return 1;
 		else
-			count++;
-			printf("%c",ch);
-	}       printf("%c", '\n');//tab between each recv'd packet
-	byte_total += (count+4);
-	//printf("\nLast char is %c\n", buf[s]);
+		    count++;
+	}
 	return 0;
 }
 
@@ -163,6 +159,7 @@ int main(int argc, char* argv[]){
 			// process
 			if (recvFile(net_buf, SIZE)) {
 				//net_buf = strip_header(net_buf);
+				byte_total += net_buf[0] + 4;
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
@@ -174,21 +171,23 @@ int main(int argc, char* argv[]){
 					//net_buf = strip_header(net_buf)
 					if(!sim_ack_loss(ack_loss_rate)){
 						ack_buf = buffer_ack();//pull seq id
-						printf("\nAck buf = %d\n", ack_buf);
+					//printf("\nAck buf = %d\n", ack_buf);
 						char* readin = (char*) malloc(81*sizeof(char));
 						readin = strip_header(net_buf);
 						readin[80] = '\0';
-						printf(readin);
+						//printf(readin);
+						byte_total += net_buf[0] + 4;
+					printf("Packet %d delivered to user", seq);
 						fputs(readin, fp); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
-						printf("DATAGRAM ACK SENT\n");
+						printf("\nAck %d generated for transmission\n", seq);
 					}else{
-						printf("ACK LOST\n");
+						printf("ACK %d LOST\n, seq");
 						dropped_acks++;
 					}
 				}else{
-					printf("Duplicate packet\n");
+					printf("Duplicate packet %d received\n", seq);
 					byte_total-=84;
 					sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number to show that I know it was sent out of order
 					dups_received++;
