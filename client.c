@@ -1,4 +1,4 @@
-// client code for UDP socket programming
+//CISC 450 Project 2 Trevor Roe and Noah Hodgson UDP Transfer
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
