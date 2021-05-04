@@ -206,7 +206,7 @@ int main(int argc, char* argv[]){
 	printf("Duplicate Packets Received: %d\n", dups_received);
 	int total_pack = packs_received - dups_received;
 	printf("Total Packets - Duplicates: %d\n", total_pack);
-	printf("Total Bytes: %d\n", bytes_received);
+	printf("Total Bytes: %d\n", byte_total);
 	printf("Good Ack Total: %d\n", good_acks);
 	printf("Dropped Ack Total: %d\n", dropped_acks);
 	int total_ack = good_acks + dropped_acks;
