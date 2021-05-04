@@ -96,8 +96,6 @@ int recvFile(char* buf, int s)
 		ch = buf[i];
 		if (ch == EOF)
 			return 1;
-		else if (ch == '\0')
-			printf("%s", "/0");
 		else
 			printf("%c",ch);
 	}       printf("%c", '\n');//tab between each recv'd packet
