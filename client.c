@@ -174,7 +174,9 @@ int main(int argc, char* argv[]){
 					if(!sim_ack_loss(ack_loss_rate)){
 						ack_buf = buffer_ack();//pull seq id
 						printf("\nAck buf = %d\n", ack_buf);
-						fprintf(fp, strip_header(net_buf)); //parse datagram
+						char* readin = (char*) malloc(81*sizeof(char));
+						readin = strip_header(net_buf);
+						fprintf(fp, readin); //parse datagram
 						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
 						printf("DATAGRAM ACK SENT\n");
