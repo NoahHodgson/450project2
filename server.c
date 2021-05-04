@@ -16,14 +16,13 @@
 #define sendrecvflag 0
 #define nofile "File Not Found!"
 
-int datapacket_num = 0;
+int init_datapacket_num = 0;
 int bytes_transmitted = 0;
-int packets_transmitted = 0;
-int suc_packets = 0;
-int dropped_packets = 0;
 int ack_count = 0;
-int timeout_count = 0;
-bool seq = 1;
+int retrans = 0;
+int ploss = 0;
+int successes = 0;
+int timedout = 0;
 
 double p_loss_rate;
 double ack_loss_rate;
@@ -54,8 +53,6 @@ int sim_loss(double loss)
 	}
 	else{
 		printf("Packet will be successful. \n");
-		datapacket_num++;
-		suc_packets++;
 		return 0;
 	}
 }
@@ -175,19 +172,20 @@ int main(int argc, char* argv[])
 			printf("\nFile open failed!\n");
 		else
 			printf("\nFile Successfully opened!\n");
-
+		ack_count++;
 		int done_flag=0;
 		ack_buf = buffer_ack();
 		while (1) {
 			// process
 			wait = 0;
 			while(!wait){
+			init_datapacket_num++;
 			RESEND:
 			if (sendFile(fp, net_buf, SIZE)) {
+				successes++;
 				printf("EOF reached\n");
 				wait = 1;
 				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-				packets_transmitted++;
 				done_flag = 1;
 				break;
 			}
@@ -197,23 +195,32 @@ int main(int argc, char* argv[])
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("datagram transfer complete\n");
 					printf("waiting for ack w/ seq: %d\n", seq);
-					packets_transmitted++;
+					successes++;
 					//moved back
 				}else{
 					printf("Packet Lost!\n");
+					ploss++;
 					invoke_seq(); //need to roll back sequence number once
 					//fseek(fp, 80L, SEEK_CUR); //now we wait for timeout with no ack
 					//this would happen if packet sent and was lost
-					dropped_packets++;
 				}
 				clearBuf(net_buf);
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
-
 				if(timeout<0){//if NO ACK
-					timeout_count++;
 					fseek(fp, -80L, SEEK_CUR);
 					printf("\n You timed out\n");//timeout waiting for ack
+					int count;
+					for (int i = 2; i < SIZE; i++) {
+							char ch = fgetc(fp);
+							count++;
+							if (ch == EOF){
+								break;
+							}
+					}
+					bytes_transmitted -= (count + 4);
 					invoke_seq(); //rollback seq number
+					retrans++;
+					timedout++;
 					goto RESEND; //resend packet
 
 				}else{ //otherwise YES WE GOT AN ACK
@@ -231,12 +238,13 @@ int main(int argc, char* argv[])
 	}
 	//printing required values
 	printf("\n===SERVER TRANSMISSION REPORT===\n");
-	printf("Datapacket total: %d\n", datapacket_num);
-	printf("Byte total: %d\n", bytes_transmitted);
-	printf("Transmitted packets total: %d\n", packets_transmitted);
-	printf("Total dropped packets: %d\n", dropped_packets);
-	printf("Total successful packets: %d\n", suc_packets);
-	printf("Number of received acks: %d\n", ack_count);
-	printf("Number of timeouts: %d\n", timeout_count);
+	printf("Initial datapacket total: %d\n", init_datapacket_num);
+	printf("Databytes generated for original transmission: %d\n", bytes_transmitted);
+	int retrans_full = retrans + init_datapacket_num;
+	printf("Retransmitted packets (retrans+init) generated: %d\n", retrans_full);
+	printf("Databytes generated for original transmission: %d\n", bytes_transmitted);
+	printf("Number of Lost Packets: %d\n", ploss);
+	printf("Number of Successful Transmissions: %d\n", successes);
+	printf("Number of Timeouts: %d\n", timedout);
 	return 0;
 }
