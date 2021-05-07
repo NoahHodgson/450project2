@@ -98,6 +98,7 @@ int sendFile(FILE* fp, char* buf, int s)
 		buf[i] = ch;
 		count++;
 		if (ch == EOF)
+			buf[i] = '\0';
 			return 1;
 	}
 	//add header in first 2 indices
@@ -202,7 +203,6 @@ int main(int argc, char* argv[])
 					ploss++;
 					//invoke_seq(); //need to roll back sequence number once
 				}
-				clearBuf(net_buf);
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
 				if(timeout<0){//if NO ACK
 					printf("\nTimeout expired for packet numbered %d\n", seq);//timeout waiting for ack
