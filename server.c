@@ -98,7 +98,6 @@ int sendFile(FILE* fp, char* buf, int s)
 		buf[i] = ch;
 		count++;
 		if (ch == EOF)
-			buf[i] = '\0';
 			return 1;
 	}
 	//add header in first 2 indices
@@ -224,8 +223,9 @@ int main(int argc, char* argv[])
 					wait = 1;
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
 					ack_count++;
+					clearBuf(net_buf);
 				}
-				clearBuf(net_buf);
+
 			} if(done_flag){ break; }
 		}
 		if (fp != NULL)
