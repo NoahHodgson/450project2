@@ -157,16 +157,16 @@ int main(int argc, char* argv[])
 		// receive file name
 		clearBuf(net_buf); wait = 1;
 		while(wait){
-		nBytes = recvfrom(sockfd, net_buf,
-				SIZE, sendrecvflag,
-				(struct sockaddr*)&addr_con, &addrlen);
+			nBytes = recvfrom(sockfd, net_buf,
+					SIZE, sendrecvflag,
+					(struct sockaddr*)&addr_con, &addrlen);
 
-		if(nBytes > 0){ //if we recieve name, we need to ack with 0!
-			wait = 0;
-			ack_buf = buffer_ack();
-			printf("filename ack: %d \n", ack_buf);
-			sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-		}
+			if(nBytes > 0){ //if we recieve name, we need to ack with 0!
+				wait = 0;
+				ack_buf = buffer_ack();
+				printf("filename ack: %d \n", ack_buf);
+				sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+			}
 		}
 		fp = fopen(net_buf, "r");
 		printf("\nFile Name Received: %s\n", net_buf);
@@ -181,42 +181,38 @@ int main(int argc, char* argv[])
 			// process
 			wait = 0;
 			while(!wait){
-			init_datapacket_num++;
-			RESEND:
-			if (sendFile(fp, net_buf, SIZE)) {
-				successes++;
-				printf("EOF reached, seq: %d\n", seq);
-				wait = 1;
-				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-				done_flag = 1;
-				break;
-			}
+				init_datapacket_num++;
+				if (sendFile(fp, net_buf, SIZE)) {
+					successes++;
+					printf("EOF reached, seq: %d\n", seq);
+					wait = 1;
+					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+					done_flag = 1;
+					break;
+				}
 				//SEND CONDITION
+				RESEND:
 				if(!sim_loss(p_loss_rate)){
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("Packet %d successfully transmitted with %d bytes\n", seq, sizeof(net_buf));
 					printf("waiting for ack w/ seq: %d\n", seq);
 					successes++;
-					//moved back
 				}else{
 					printf("Packet %d Lost!\n", seq);
 					ploss++;
-					invoke_seq(); //need to roll back sequence number once
-					//fseek(fp, 80L, SEEK_CUR); //now we wait for timeout with no ack
-					//this would happen if packet sent and was lost
+					//invoke_seq(); //need to roll back sequence number once
 				}
 				clearBuf(net_buf);
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
 				if(timeout<0){//if NO ACK
-					fseek(fp, -80L, SEEK_CUR);
 					printf("\nTimeout expired for packet numbered %d\n", seq);//timeout waiting for ack
 					int count;
 					for (int i = 2; i < SIZE; i++) {
-							char ch = fgetc(fp);
-							count++;
-							if (ch == EOF){
-								break;
-							}
+						char ch = fgetc(fp);
+						count++;
+						if (ch == EOF){
+							break;
+						}
 					}
 					bytes_transmitted -= (count + 4);
 					invoke_seq(); //rollback seq number
@@ -229,12 +225,13 @@ int main(int argc, char* argv[])
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
 					ack_count++;
 				}
+				clearBuf(net_buf);
 			} if(done_flag){ break; }
 		}
 		if (fp != NULL)
 			fclose(fp);
 		if(done_flag){
-		break;
+			break;
 		}
 	}
 	//printing required values
