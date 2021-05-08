@@ -102,6 +102,7 @@ int sendFile(FILE* fp, char* buf, int s)
 // driver code
 int main(int argc, char* argv[])
 {
+	srand(time(0));
 	int sockfd, nBytes;
 	bool wait; //for use when waiting for ack's
 	struct sockaddr_in addr_con;

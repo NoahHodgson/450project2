@@ -89,6 +89,7 @@ int recvFile(char* buf, int s)
 
 // driver code
 int main(int argc, char* argv[]){
+	srand(time(0));
 	//loading in values that are passed in
 	if(argc != 4){
 		printf("Error, program requires arg for packet loss, ack loss, and timeout value to run.");
@@ -146,6 +147,7 @@ int main(int argc, char* argv[]){
 			// process
 			if (recvFile(net_buf, SIZE)) {
 				byte_total += net_buf[0] + 4;
+				printf("%s\n\n",strip_header(net_buf));
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
