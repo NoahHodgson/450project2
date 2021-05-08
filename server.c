@@ -209,7 +209,6 @@ int main(int argc, char* argv[])
 					timedout++;
 					int goback = count%80;
 					if (goback == 0){goback=80;}
-					else{goback = 0;}
 					printf("go back: %d\n\n", count);
 					fseek(fp, -goback, SEEK_CUR);
 				}else{ //otherwise YES WE GOT AN ACK
