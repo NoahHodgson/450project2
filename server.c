@@ -166,7 +166,6 @@ int main(int argc, char* argv[])
 			printf("\nFile open failed!\n");
 		else
 			printf("\nFile Successfully opened!\n");
-		ack_count++;
 		int done_flag=0;
 		int sub_flag=0;
 		clearBuf(net_buf);
@@ -210,8 +209,11 @@ int main(int argc, char* argv[])
 					if (goback == 0){goback=80;}
 					if(!flag && goback != 80){
 						fseek(fp, -goback+1, SEEK_CUR);
-						bytes_transmitted -= goback+4;
+						if(sub_flag){
+							bytes_transmitted -= goback+4;
+						}
 						flag=1;
+						sub_flag=1;
 					}
 					else if(!flag && goback == 80){
 						fseek(fp, -goback, SEEK_CUR);
