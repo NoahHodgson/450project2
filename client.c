@@ -149,7 +149,7 @@ int main(int argc, char* argv[]){
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
-				break;
+				goto Skip;
 			}
 			else {
 				packs_received++;
@@ -184,6 +184,7 @@ int main(int argc, char* argv[]){
 			break;
 		}
 	}
+	Skip:
 	printf("\n===CLIENT TRANSMISSION REPORT===\n");
 	printf("All Packets Received: %d\n", packs_received);
 	printf("Duplicate Packets Received: %d\n", dups_received);
