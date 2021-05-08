@@ -152,7 +152,6 @@ int main(int argc, char* argv[]){
 				done_flag = 1;
 				sendto(sockfd, &ack_seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 				good_acks++;
-				packs_received++;
 				printf("\nAck %d generated for transmission\n", ack_seq);
 				goto Skip;
 			}
