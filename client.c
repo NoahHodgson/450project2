@@ -157,10 +157,10 @@ int main(int argc, char* argv[]){
 				packs_received++;
 				if(net_buf[1] == seq){
 					ack_seq = net_buf[1];
+					byte_total += net_buf[0] + 4;
 					char* readin = (char*) malloc(81*sizeof(char));
 					readin = strip_header(net_buf);
 					readin[80] = '\0';
-					byte_total += net_buf[0] + 4;
 					printf("Packet %d delivered to user", seq);
 					fputs(readin, fp); //parse datagram
 					seq = 1 - seq;

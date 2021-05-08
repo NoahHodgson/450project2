@@ -90,6 +90,7 @@ int sendFile(FILE* fp, char* buf, int s)
 		buf[i] = ch;
 		count++;
 		if (ch == EOF)
+			buf[i] = '';
 			return 1;
 	}
 	//add header in first 2 indices
