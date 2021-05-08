@@ -95,7 +95,7 @@ int sendFile(FILE* fp, char* buf, int s)
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
 	buf[1] = seq; //flip every time
-	printf("Packet %d generated with %d data bytes\n", buf[1], buf[0]);
+	printf("Packet %d generated with %d data bytes\n", buf[1], buf[0]+4);
 	bytes_transmitted += (count + 4); //"four" header bytes plus datagram
 	return 0;
 }

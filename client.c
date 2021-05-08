@@ -75,7 +75,7 @@ int recvFile(char* buf, int s)
 {
 	int i;
 	char ch;
-	printf("\nPacket %d recieved with %d data bytes\n",buf[1], buf[0]+2);
+	printf("\nPacket %d recieved with %d data bytes\n",buf[1], buf[0]+4);
 	int count;
 	for (i = 2; i < s; i++) {
 		ch = buf[i];
@@ -84,6 +84,7 @@ int recvFile(char* buf, int s)
 		else
 			count++;
 	}
+	byte_total += buf[0] + 4;
 	return 0;
 }
 
@@ -146,7 +147,6 @@ int main(int argc, char* argv[]){
 					&addrlen);
 			// process
 			if (recvFile(net_buf, SIZE)) {
-				byte_total += net_buf[0] + 4;
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
@@ -156,7 +156,6 @@ int main(int argc, char* argv[]){
 				packs_received++;
 				if(net_buf[1] == seq){
 					ack_seq = net_buf[1];
-					byte_total += net_buf[0] + 4;
 					char* readin = (char*) malloc(81*sizeof(char));
 					readin = strip_header(net_buf);
 					readin[80] = '\0';
