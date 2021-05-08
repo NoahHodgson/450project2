@@ -87,11 +87,10 @@ int sendFile(FILE* fp, char* buf, int s)
 	char ch, ch2;
 	for (i = 2; i < s; i++) {
 		ch = fgetc(fp);
+		if (ch == EOF)
+			return 1;
 		buf[i] = ch;
 		count++;
-		if (ch == EOF)
-			buf[i] = '';
-			return 1;
 	}
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
