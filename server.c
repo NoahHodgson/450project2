@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
 						flag=1;
 					}
 					else if(!flag && goback == 80){
-						fseek(fp, -goback+1, SEEK_CUR);
+						fseek(fp, -goback, SEEK_CUR);
 						flag=1;
 					}
 				}else{ //otherwise YES WE GOT AN ACK
