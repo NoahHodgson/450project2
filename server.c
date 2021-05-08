@@ -206,9 +206,10 @@ int main(int argc, char* argv[])
 					bytes_transmitted -= (count + 4);
 					retrans++;
 					timedout++;
-					printf("go back: %d\n\n", count);
 					int goback = count%80;
 					if (goback == 0){goback=80;}
+					else{goback = 0;}
+					printf("go back: %d\n\n", count);
 					fseek(fp, -goback, SEEK_CUR);
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
