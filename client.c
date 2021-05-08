@@ -153,31 +153,29 @@ int main(int argc, char* argv[]){
 			else {
 				packs_received++;
 				if(net_buf[1] == seq){
-					seq = 1-seq;
 					char* readin = (char*) malloc(81*sizeof(char));
 					readin = strip_header(net_buf);
 					readin[80] = '\0';
 					byte_total += net_buf[0] + 4;
 					printf("Packet %d delivered to user", seq);
 					fputs(readin, fp); //parse datagram
-					if(!sim_ack_loss(ack_loss_rate)){
-						sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
-						good_acks++;
-						printf("\nAck %d generated for transmission\n", seq);
-					}
-					else{
-						printf("ACK %d LOST\n, seq");
-						dropped_acks++;
-					}
-				}else{
+				} else{
 					printf("Duplicate packet %d received\n", seq);
 					byte_total-=84;
-					sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number to show that I know it was sent out of order
 					dups_received++;
 				}
-				//else we go here and just send the acknowledgement and don't write to file
-			}//loopback to recvfrom
-		}
+				if(!sim_ack_loss(ack_loss_rate)){
+					sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+					good_acks++;
+					printf("\nAck %d generated for transmission\n", seq);
+				}
+				else{
+					printf("ACK %d LOST\n, seq");
+					dropped_acks++;
+				}
+			}
+			//else we go here and just send the acknowledgement and don't write to file
+		}//loopback to recvfrom
 		printf("\n-------------------------------\n");
 		if(done_flag){
 			break;
