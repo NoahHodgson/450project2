@@ -150,6 +150,8 @@ int main(int argc, char* argv[]){
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
+				sendto(sockfd, &ack_seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+				printf("\nAck %d generated for transmission\n", ack_seq);
 				goto Skip;
 			}
 			else {
