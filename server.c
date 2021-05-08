@@ -190,7 +190,6 @@ int main(int argc, char* argv[])
 				}else{
 					printf("Packet %d Lost!\n", seq);
 					ploss++;
-					//invoke_seq(); //need to roll back sequence number once
 				}
 				int timeout = recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
 				if(timeout<0){//if NO ACK
@@ -206,7 +205,7 @@ int main(int argc, char* argv[])
 					bytes_transmitted -= (count + 4);
 					retrans++;
 					timedout++;
-					fseek(fp, -80L, SEEK_CUR);
+					fseek(fp, -count, SEEK_CUR);
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
