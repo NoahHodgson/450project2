@@ -179,6 +179,7 @@ int main(int argc, char* argv[])
 				done_flag = 1;
 				recvfrom(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, &addrlen);
 				ack_count++;
+				successes++;
 				printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
 				break;
 			}
