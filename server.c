@@ -206,6 +206,7 @@ int main(int argc, char* argv[])
 					bytes_transmitted -= (count + 4);
 					retrans++;
 					timedout++;
+					fseek(fp, -80L, SEEK_CUR);
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
