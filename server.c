@@ -206,7 +206,9 @@ int main(int argc, char* argv[])
 					retrans++;
 					timedout++;
 					printf("go back: %d\n\n", count);
-					fseek(fp, -count, SEEK_CUR);
+					int goback = count%80;
+					if (goback == 0){goback=80;}
+					fseek(fp, -goback, SEEK_CUR);
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
