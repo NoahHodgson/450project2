@@ -167,7 +167,7 @@ int main(int argc, char* argv[]){
 				}
 			}
 			if(!sim_ack_loss(ack_loss_rate)){
-				sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+				sendto(sockfd, &net_buf[1], 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 				good_acks++;
 				printf("\nAck %d generated for transmission\n", seq);
 			}
