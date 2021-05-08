@@ -174,6 +174,7 @@ int main(int argc, char* argv[])
 			if (sendFile(fp, net_buf, SIZE)) {
 				successes++;
 				printf("EOF reached, seq: %d\n", seq);
+				printf("%s \n", strip_header(net_buf));
 				wait = 1;
 				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 				done_flag = 1;
