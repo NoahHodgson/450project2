@@ -182,6 +182,7 @@ int main(int argc, char* argv[])
 			}
 			init_datapacket_num++;
 			wait = 0;
+			int flag=0;
 			while(!wait){
 				if(!sim_loss(p_loss_rate)){
 					printf("%s \n", strip_header(net_buf));
@@ -210,7 +211,10 @@ int main(int argc, char* argv[])
 					int goback = count%80;
 					if (goback == 0){goback=80;}
 					printf("go back: %d\n\n", count);
-					fseek(fp, -goback, SEEK_CUR);
+					if(!flag){
+						fseek(fp, -goback, SEEK_CUR);
+						flag=1;
+					}
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
