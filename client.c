@@ -136,6 +136,7 @@ int main(int argc, char* argv[]){
 		printf("\nfilename ACK successful, ack = %d\n", ack_buf);
 		printf("\n---------Data Received---------\n");
 		int done_flag = 0;
+		int ack_seq = 0;
 		while (1) {
 			// receive
 			bzero(net_buf, SIZE);
@@ -153,6 +154,7 @@ int main(int argc, char* argv[]){
 			else {
 				packs_received++;
 				if(net_buf[1] == seq){
+					ack_seq = net_buf[1];
 					char* readin = (char*) malloc(81*sizeof(char));
 					readin = strip_header(net_buf);
 					readin[80] = '\0';
@@ -167,7 +169,7 @@ int main(int argc, char* argv[]){
 				}
 			}
 			if(!sim_ack_loss(ack_loss_rate)){
-				sendto(sockfd, &net_buf[1], 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+				sendto(sockfd, &ack_seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 				good_acks++;
 				printf("\nAck %d generated for transmission\n", net_buf[1]);
 			}

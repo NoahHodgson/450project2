@@ -64,6 +64,13 @@ void clearBuf(char* b)
 	for (i = 0; i < SIZE; i++)
 		b[i] = '\0';
 }
+
+char* strip_header(char* buffer){
+	char* b = (char*) malloc(81*sizeof(char));
+	strcpy(b, &buffer[2]);
+	return b;
+}
+
 // function sending file
 int sendFile(FILE* fp, char* buf, int s)
 {
@@ -175,7 +182,7 @@ int main(int argc, char* argv[])
 			wait = 0;
 			while(!wait){
 				if(!sim_loss(p_loss_rate)){
-					printf("%s \n", net_buf);
+					printf("%s \n", strip_header(net_buf));
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("Packet %d successfully transmitted with %d bytes\n", seq, sizeof(net_buf));
 					printf("waiting for ack w/ seq: %d\n", seq);
