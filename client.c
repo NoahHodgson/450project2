@@ -147,7 +147,6 @@ int main(int argc, char* argv[]){
 			// process
 			if (recvFile(net_buf, SIZE)) {
 				byte_total += net_buf[0] + 4;
-				printf("%s\n\n",strip_header(net_buf));
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
 				done_flag = 1;
@@ -173,10 +172,10 @@ int main(int argc, char* argv[]){
 			if(!sim_ack_loss(ack_loss_rate)){
 				sendto(sockfd, &ack_seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 				good_acks++;
-				printf("\nAck %d generated for transmission\n", net_buf[1]);
+				printf("\nAck %d generated for transmission\n", ack_seq);
 			}
 			else{
-				printf("ACK %d LOST\n, seq");
+				printf("ACK %d LOST\n", ack_seq);
 				dropped_acks++;
 			}
 			//else we go here and just send the acknowledgement and don't write to file

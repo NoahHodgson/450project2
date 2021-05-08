@@ -174,7 +174,6 @@ int main(int argc, char* argv[])
 			if (sendFile(fp, net_buf, SIZE)) {
 				successes++;
 				printf("EOF reached, seq: %d\n", seq);
-				printf("%s \n", strip_header(net_buf));
 				wait = 1;
 				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 				done_flag = 1;
@@ -185,7 +184,6 @@ int main(int argc, char* argv[])
 			int flag=0;
 			while(!wait){
 				if(!sim_loss(p_loss_rate)){
-					printf("%s \n", strip_header(net_buf));
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("Packet %d successfully transmitted with %d bytes\n", seq, sizeof(net_buf));
 					printf("waiting for ack w/ seq: %d\n", seq);
@@ -205,18 +203,18 @@ int main(int argc, char* argv[])
 							break;
 						}
 					}
-					bytes_transmitted -= (count + 4);
 					retrans++;
 					timedout++;
 					int goback = count%80;
 					if (goback == 0){goback=80;}
-					printf("go back: %d\n\n", count);
 					if(!flag && goback != 80){
 						fseek(fp, -goback+1, SEEK_CUR);
+						bytes_transmitted -= goback+4;
 						flag=1;
 					}
 					else if(!flag && goback == 80){
 						fseek(fp, -goback, SEEK_CUR);
+						bytes_transmitted -= 84;
 					}
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
