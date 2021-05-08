@@ -209,18 +209,10 @@ int main(int argc, char* argv[])
 					if (goback == 0){goback=80;}
 					if(!flag && goback != 80){
 						fseek(fp, -goback+1, SEEK_CUR);
-						if(sub_flag){
-							bytes_transmitted -= goback+4;
-						}
 						flag=1;
-						sub_flag=1;
 					}
 					else if(!flag && goback == 80){
 						fseek(fp, -goback, SEEK_CUR);
-						if(!sub_flag){
-							bytes_transmitted -= 84;
-							sub_flag=1;
-						}
 					}
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
