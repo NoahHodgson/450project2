@@ -168,6 +168,7 @@ int main(int argc, char* argv[])
 			printf("\nFile Successfully opened!\n");
 		ack_count++;
 		int done_flag=0;
+		int sub_flag=0;
 		clearBuf(net_buf);
 		while (1) {
 			// process
@@ -214,7 +215,10 @@ int main(int argc, char* argv[])
 					}
 					else if(!flag && goback == 80){
 						fseek(fp, -goback, SEEK_CUR);
-						bytes_transmitted -= 84;
+						if(!sub_flag){
+							bytes_transmitted -= 84;
+							sub_flag=1;
+						}
 					}
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
