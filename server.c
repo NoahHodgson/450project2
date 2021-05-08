@@ -175,6 +175,7 @@ int main(int argc, char* argv[])
 			wait = 0;
 			while(!wait){
 				if(!sim_loss(p_loss_rate)){
+					printf("%s \n", net_buf);
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("Packet %d successfully transmitted with %d bytes\n", seq, sizeof(net_buf));
 					printf("waiting for ack w/ seq: %d\n", seq);
