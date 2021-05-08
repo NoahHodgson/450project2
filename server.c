@@ -211,8 +211,12 @@ int main(int argc, char* argv[])
 					int goback = count%80;
 					if (goback == 0){goback=80;}
 					printf("go back: %d\n\n", count);
-					if(!flag){
-						fseek(fp, -goback, SEEK_CUR);
+					if(!flag && goback != 80){
+						fseek(fp, -goback+1, SEEK_CUR);
+						flag=1;
+					}
+					else if(!flag && goback == 80){
+						fseek(fp, -goback+1, SEEK_CUR);
 						flag=1;
 					}
 				}else{ //otherwise YES WE GOT AN ACK
