@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
 					bytes_transmitted -= (count + 4);
 					retrans++;
 					timedout++;
-					printf("go back: %d\n\n");
+					printf("go back: %d\n\n", count);
 					fseek(fp, -count, SEEK_CUR);
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
