@@ -159,20 +159,21 @@ int main(int argc, char* argv[]){
 					byte_total += net_buf[0] + 4;
 					printf("Packet %d delivered to user", seq);
 					fputs(readin, fp); //parse datagram
+					seq = 1 - seq;
 				} else{
 					printf("Duplicate packet %d received\n", seq);
 					byte_total-=84;
 					dups_received++;
 				}
-				if(!sim_ack_loss(ack_loss_rate)){
-					sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
-					good_acks++;
-					printf("\nAck %d generated for transmission\n", seq);
-				}
-				else{
-					printf("ACK %d LOST\n, seq");
-					dropped_acks++;
-				}
+			}
+			if(!sim_ack_loss(ack_loss_rate)){
+				sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+				good_acks++;
+				printf("\nAck %d generated for transmission\n", seq);
+			}
+			else{
+				printf("ACK %d LOST\n, seq");
+				dropped_acks++;
 			}
 			//else we go here and just send the acknowledgement and don't write to file
 		}//loopback to recvfrom
