@@ -23,26 +23,11 @@ int retrans = 0;
 int ploss = 0;
 int successes = 0;
 int timedout = 0;
-int seq = 1;
+short seq = 0;
 
 double p_loss_rate;
 double ack_loss_rate;
 int timeout_val;
-
-bool invoke_seq(){
-	seq = !seq;
-	return seq;
-}
-
-short buffer_ack(){ //seq flips every time starting at 1, so first return (for filename ack) is 0
-	invoke_seq();
-	if(seq == true){
-		return 1;
-	} else {
-		return 0;
-	}
-	//printf("seq: %d\n",seq);
-}
 
 //simulate packet loss by using a random float between 0 and 1.
 int sim_loss(double loss)
@@ -102,7 +87,7 @@ int sendFile(FILE* fp, char* buf, int s)
 	}
 	//add header in first 2 indices
 	buf[0] = count;//each char is 1 byte
-	buf[1] = invoke_seq(); //flip every time
+	buf[1] = seq; //flip every time
 	printf("Packet %d generated with %d data bytes\n", buf[1], buf[0]);
 	bytes_transmitted += (count + 4); //"four" header bytes plus datagram
 	return 0;
@@ -163,7 +148,6 @@ int main(int argc, char* argv[])
 
 			if(nBytes > 0){ //if we recieve name, we need to ack with 0!
 				wait = 0;
-				ack_buf = buffer_ack();
 				printf("filename ack: %d \n", ack_buf);
 				sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
 			}
@@ -176,22 +160,20 @@ int main(int argc, char* argv[])
 			printf("\nFile Successfully opened!\n");
 		ack_count++;
 		int done_flag=0;
-		ack_buf = buffer_ack();
+		clearBuf(net_buf);
 		while (1) {
 			// process
+			if (sendFile(fp, net_buf, SIZE)) {
+				successes++;
+				printf("EOF reached, seq: %d\n", seq);
+				wait = 1;
+				sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
+				done_flag = 1;
+				break;
+			}
+			init_datapacket_num++;
 			wait = 0;
 			while(!wait){
-				init_datapacket_num++;
-				if (sendFile(fp, net_buf, SIZE)) {
-					successes++;
-					printf("EOF reached, seq: %d\n", seq);
-					wait = 1;
-					sendto(sockfd, net_buf, SIZE, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);
-					done_flag = 1;
-					break;
-				}
-				//SEND CONDITION
-				RESEND:
 				if(!sim_loss(p_loss_rate)){
 					sendto(sockfd, net_buf, SIZE,sendrecvflag,(struct sockaddr*)&addr_con, addrlen);
 					printf("Packet %d successfully transmitted with %d bytes\n", seq, sizeof(net_buf));
@@ -214,14 +196,13 @@ int main(int argc, char* argv[])
 						}
 					}
 					bytes_transmitted -= (count + 4);
-					invoke_seq(); //rollback seq number
 					retrans++;
 					timedout++;
-					goto RESEND; //resend packet
-
 				}else{ //otherwise YES WE GOT AN ACK
 					wait = 1;
 					printf("\nDATAGRAM ACK %d RECIEVED\n", seq);
+					//go sequence number
+					seq=1-seq;
 					ack_count++;
 					clearBuf(net_buf);
 				}

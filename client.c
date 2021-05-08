@@ -21,26 +21,12 @@ int dups_received = 0;
 int bytes_received = 0;
 int good_acks = 0;
 int dropped_acks = 0;
-bool seq = 0;
+short seq = 0;
 int byte_total = 0;
 
 double p_loss_rate;
 double ack_loss_rate;
 int timeout_val;
-
-bool invoke_seq(){
-	seq = !seq;
-	return seq;
-}
-
-short buffer_ack(){
-	invoke_seq();
-	if(seq == true){
-		return 1;
-	} else {
-		return 0;
-	}
-}
 
 //simulate packet loss by using a random float between 0 and 1.
 int sim_loss(double loss)
@@ -94,9 +80,9 @@ int recvFile(char* buf, int s)
 	for (i = 2; i < s; i++) {
 		ch = buf[i];
 		if (ch == EOF)
-		    return 1;
+			return 1;
 		else
-		    count++;
+			count++;
 	}
 	return 0;
 }
@@ -158,7 +144,6 @@ int main(int argc, char* argv[]){
 					&addrlen);
 			// process
 			if (recvFile(net_buf, SIZE)) {
-				//net_buf = strip_header(net_buf);
 				byte_total += net_buf[0] + 4;
 				fputs(strip_header(net_buf), fp);
 				fclose(fp);
@@ -167,29 +152,27 @@ int main(int argc, char* argv[]){
 			}
 			else {
 				packs_received++;
-				if(ack_buf == seq){
-					//net_buf = strip_header(net_buf)
-					if(!sim_ack_loss(ack_loss_rate)){
-						ack_buf = buffer_ack();//pull seq id
-					//printf("\nAck buf = %d\n", ack_buf);
-						char* readin = (char*) malloc(81*sizeof(char));
-						readin = strip_header(net_buf);
-						readin[80] = '\0';
-						//printf(readin);
-						byte_total += net_buf[0] + 4;
+				if(net_buf[1] == seq){
+					seq = 1-seq;
+					char* readin = (char*) malloc(81*sizeof(char));
+					readin = strip_header(net_buf);
+					readin[80] = '\0';
+					byte_total += net_buf[0] + 4;
 					printf("Packet %d delivered to user", seq);
-						fputs(readin, fp); //parse datagram
-						sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
+					fputs(readin, fp); //parse datagram
+					if(!sim_ack_loss(ack_loss_rate)){
+						sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number
 						good_acks++;
 						printf("\nAck %d generated for transmission\n", seq);
-					}else{
+					}
+					else{
 						printf("ACK %d LOST\n, seq");
 						dropped_acks++;
 					}
 				}else{
 					printf("Duplicate packet %d received\n", seq);
 					byte_total-=84;
-					sendto(sockfd, &ack_buf, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number to show that I know it was sent out of order
+					sendto(sockfd, &seq, 1, sendrecvflag, (struct sockaddr*)&addr_con, addrlen);//ack with seq number to show that I know it was sent out of order
 					dups_received++;
 				}
 				//else we go here and just send the acknowledgement and don't write to file
